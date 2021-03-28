@@ -9,6 +9,7 @@ RTA.clients.config.getConfig = function(client, name) {
 		"flood WebUI" : RTA.clients.config.flood,
 		"flood-jesec WebUI" : RTA.clients.config.floodJesec,
 		"QNAP DownloadStation" : RTA.clients.config.qnap,
+		"Synology WebUI" : RTA.clients.config.synology,
 		"qBittorrent WebUI" : RTA.clients.config.qbittorrent,
 		"qBittorrent v4.1+ WebUI" : RTA.clients.config.qbittorrentv2,
 		"rTorrent XML-RPC" : RTA.clients.config.rtorrentxmlrpc
@@ -245,6 +246,20 @@ RTA.clients.config.qnap = multiline(function(){/*
 					<td><span class="title">Destination Directory</span><br /></td>
 					<td><input type="text" name="qnapmove" /><br />
 						<span class="tip">After torrent has completed it will be moved to this directory.</span></td>
+				</tr>
+			</tbody>
+			*/});
+
+RTA.clients.config.synology = multiline(function(){/*
+			<tbody name="synologyspecifics" class="specifics">
+				<tr>
+					<td><span class="title">API version</span><br /></td>
+					<td><select name="synologyapiversion">
+							<option value="2">v2</option>
+							<option value="3">v3</option>
+						</select>
+						<br />
+						<span class="tip">More recent versions of Download Station might need V3.</span></td>
 				</tr>
 			</tbody>
 			*/});
