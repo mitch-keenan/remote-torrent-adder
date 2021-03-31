@@ -46,7 +46,7 @@ RTA.clients.synologyAdder = function(server, torrentdata, torrentname) {
 		   
 		   message += "--" + boundary + "\r\n";
 		   message += "Content-Disposition: form-data; name=\"version\"\r\n\r\n";
-		   message += "2" + "\r\n";
+		   message += ver + "\r\n";
 		   
 		   message += "--" + boundary + "\r\n";
 		   message += "Content-Disposition: form-data; name=\"method\"\r\n\r\n";
