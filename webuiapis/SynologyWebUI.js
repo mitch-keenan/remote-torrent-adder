@@ -27,8 +27,6 @@ RTA.clients.synologyAdder = function(server, torrentdata, torrentname) {
 	}
 	
 	if(torrentdata.substring(0,7) == "magnet:") {
-		console.log("DATA: " + torrentdata);
-		console.log("GET: " + scheme + server.host + ":" + server.port + "/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=" + ver + "&method=create&_sid=" + sid + "&uri=" + encodeURIComponent(torrentdata));
 		var mxhr = new XMLHttpRequest();
 		mxhr.open("GET", scheme + server.host + ":" + server.port + "/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=" + ver + "&method=create&_sid=" + sid + "&uri=" + encodeURIComponent(torrentdata), true);
 		mxhr.onreadystatechange = handleResponse;
