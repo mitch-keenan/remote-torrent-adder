@@ -14,6 +14,7 @@ function handleResponse(server, data) {
 RTA.clients.synologyAdder = function(server, torrentdata, torrentname) {
 	var scheme = server.hostsecure ? "https://" : "http://";
 	const ver = server.synologyapiversion || 2; // fallback for old configs
+	let dest = server.synologydestination || "";
 
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", scheme + server.host + ":" + server.port + "/webapi/auth.cgi?api=SYNO.API.Auth&version=" + ver + "&method=login&account=" + server.login + "&passwd=" + server.password + "&session=DownloadStation&format=sid", false);
@@ -33,33 +34,67 @@ RTA.clients.synologyAdder = function(server, torrentdata, torrentname) {
 		mxhr.send(message);
 	} else {
 		var xhr = new XMLHttpRequest();
-		xhr.open("POST", scheme + server.host + ":" + server.port + "/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=" + ver + "&method=create&_sid=" + sid, true);
-		xhr.onreadystatechange = handleResponse;
-		// mostly stolen from https://github.com/igstan/ajax-file-upload/blob/master/complex/uploader.js
-		var boundary = "AJAX-----------------------" + (new Date).getTime();
-		xhr.setRequestHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
-		var message = "--" + boundary + "\r\n";
-		   message += "Content-Disposition: form-data; name=\"api\"\r\n\r\n";
-		   message += "SYNO.DownloadStation.Task" + "\r\n";
-		   
-		   message += "--" + boundary + "\r\n";
-		   message += "Content-Disposition: form-data; name=\"version\"\r\n\r\n";
-		   message += ver + "\r\n";
-		   
-		   message += "--" + boundary + "\r\n";
-		   message += "Content-Disposition: form-data; name=\"method\"\r\n\r\n";
-		   message += "create" + "\r\n";
-		   
-		   message += "--" + boundary + "\r\n";
-		   message += "Content-Disposition: form-data; name=\"_sid\"\r\n\r\n";
-		   message += sid + "\r\n";
-		   
-		   message += "--" + boundary + "\r\n";
-		   message += "Content-Disposition: form-data; name=\"file\"; filename=\"" + torrentname + "\"\r\n";
-		   message += "Content-Type: application/octet-stream\r\n\r\n";
-		   message += torrentdata + "\r\n";
-		   
-		   message += "--" + boundary + "--\r\n";
+		if(ver == 2) {
+			xhr.open("POST", scheme + server.host + ":" + server.port + "/webapi/DownloadStation/task.cgi?api=SYNO.DownloadStation.Task&version=2&method=create&_sid=" + sid, true);
+			xhr.onreadystatechange = handleResponse;
+			// mostly stolen from https://github.com/igstan/ajax-file-upload/blob/master/complex/uploader.js
+			var boundary = "AJAX-----------------------" + (new Date).getTime();
+			xhr.setRequestHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
+			var message = "--" + boundary + "\r\n";
+				message += "Content-Disposition: form-data; name=\"api\"\r\n\r\n";
+				message += "SYNO.DownloadStation.Task" + "\r\n";
+				
+				message += "--" + boundary + "\r\n";
+				message += "Content-Disposition: form-data; name=\"version\"\r\n\r\n";
+				message += "2\r\n";
+				
+				message += "--" + boundary + "\r\n";
+				message += "Content-Disposition: form-data; name=\"method\"\r\n\r\n";
+				message += "create" + "\r\n";
+				
+				message += "--" + boundary + "\r\n";
+				message += "Content-Disposition: form-data; name=\"_sid\"\r\n\r\n";
+				message += sid + "\r\n";
+				
+				message += "--" + boundary + "\r\n";
+				message += "Content-Disposition: form-data; name=\"file\"; filename=\"" + torrentname + "\"\r\n";
+				message += "Content-Type: application/octet-stream\r\n\r\n";
+				message += torrentdata + "\r\n";
+				
+				message += "--" + boundary + "--\r\n";
+		} else if(ver == 3) {
+			xhr.open("POST", scheme + server.host + ":" + server.port + "webapi/entry.cgi", true);
+			xhr.onreadystatechange = handleResponse;
+			// mostly stolen from https://github.com/igstan/ajax-file-upload/blob/master/complex/uploader.js
+			var boundary = "AJAX-----------------------" + (new Date).getTime();
+			xhr.setRequestHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
+			var message = "--" + boundary + "\r\n";
+				message += "Content-Disposition: form-data; name=\"api\"\r\n\r\n";
+				message += "SYNO.DownloadStation2.Task" + "\r\n";
+				
+				message += "--" + boundary + "\r\n";
+				message += "Content-Disposition: form-data; name=\"version\"\r\n\r\n";
+				message += "2\r\n";
+				
+				message += "--" + boundary + "\r\n";
+				message += "Content-Disposition: form-data; name=\"method\"\r\n\r\n";
+				message += "create" + "\r\n";
+				
+				message += "--" + boundary + "\r\n";
+				message += "Content-Disposition: form-data; name=\"session\"\r\n\r\n";
+				message += sid + "\r\n";
+				
+				message += "--" + boundary + "\r\n";
+				message += "Content-Disposition: form-data; name=\"destination\"\r\n\r\n";
+				message += '"' + dest + '"' + "\r\n";
+				
+				message += "--" + boundary + "\r\n";
+				message += 'Content-Disposition: form-data; name="\"file\""; filename=\"' + torrentname + "\"\r\n";
+				message += "Content-Type: application/octet-stream\r\n\r\n";
+				message += torrentdata + "\r\n";
+				
+				message += "--" + boundary + "--\r\n";
+		}
 		
 		xhr.sendAsBinary(message);
 	}

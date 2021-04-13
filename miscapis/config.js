@@ -261,6 +261,11 @@ RTA.clients.config.synology = multiline(function(){/*
 						<br />
 						<span class="tip">More recent versions of Download Station might need V3.</span></td>
 				</tr>
+				<tr>
+					<td><span class="title">Destination Directory</span><br /></td>
+					<td><input type="text" name="synologydestination" /><br />
+						<span class="tip">REQUIRED for v3 - Torrent will be downloaded to this directory.</span></td>
+				</tr>
 			</tbody>
 			*/});
 
