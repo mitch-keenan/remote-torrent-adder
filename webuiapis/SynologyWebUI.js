@@ -63,7 +63,7 @@ RTA.clients.synologyAdder = function(server, torrentdata, torrentname) {
 				
 				message += "--" + boundary + "--\r\n";
 		} else if(ver == 3) {
-			xhr.open("POST", scheme + server.host + ":" + server.port + "webapi/entry.cgi", true);
+			xhr.open("POST", scheme + server.host + ":" + server.port + "/webapi/entry.cgi", true);
 			xhr.onreadystatechange = handleResponse;
 			// mostly stolen from https://github.com/igstan/ajax-file-upload/blob/master/complex/uploader.js
 			var boundary = "AJAX-----------------------" + (new Date).getTime();
