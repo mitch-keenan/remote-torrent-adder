@@ -113,7 +113,7 @@ RTA.audioNotification = function(error) {
 
 
 RTA.displayResponse = function(title, message, error=false) {
-	if(localStorage.getItem("showpopups") == "true") {
+	if(RTA.storage.getItem("showpopups") == "true") {
 		var opts = { 
 					type: "basic", 
 					iconUrl: (error === true) ? "icons/BitTorrent128-red.png" : "icons/BitTorrent128.png", 
@@ -126,12 +126,12 @@ RTA.displayResponse = function(title, message, error=false) {
 		chrome.notifications.create(id, opts, function(myId) { 
 			setTimeout(function() {
 				chrome.notifications.clear(myId, function() {});
-			}, localStorage.getItem('popupduration'));
+			}, RTA.storage.getItem('popupduration'));
 		});
 		
 		
 		
-		if(localStorage.getItem("hearpopups") == "true") {
+		if(RTA.storage.getItem("hearpopups") == "true") {
 			RTA.audioNotification(error);
 		}
 	}
@@ -141,7 +141,7 @@ RTA.displayResponse = function(title, message, error=false) {
 RTA.constructContextMenu = function() {
 	chrome.contextMenus.removeAll();
 
-	if(localStorage.getItem("catchfromcontextmenu") == "true") {
+	if(RTA.storage.getItem("catchfromcontextmenu") == "true") {
 		// for if there's only one entry
 		var contextMenuId = chrome.contextMenus.create({
 			"title": "Add to Remote WebUI",
@@ -151,7 +151,7 @@ RTA.constructContextMenu = function() {
 		menuItemIndexToServerIndex[contextMenuId] = 0;
 
 		// check if there's more than one entry and add them as sub-entries in the context menu
-		var servers = localStorage.getItem("servers") ? JSON.parse(localStorage.getItem("servers")) : [];
+		var servers = RTA.storage.getItem("servers") ? JSON.parse(RTA.storage.getItem("servers")) : [];
 		var numServers = servers.length;
 
 		if(numServers > 1) {
@@ -178,7 +178,7 @@ RTA.constructContextMenu = function() {
 
 
 RTA.genericOnClick = function(info, tab) {
-	var servers = JSON.parse(localStorage.getItem("servers"));
+	var servers = JSON.parse(RTA.storage.getItem("servers"));
 	var serverId = menuItemIndexToServerIndex[info.menuItemId];
 
 	if(serverId === -1) { // send to all servers
@@ -186,16 +186,16 @@ RTA.genericOnClick = function(info, tab) {
 			RTA.getTorrent(servers[i], info.linkUrl, null, null, tab.url);
 		}
 	} else { // only one server specified
-		var server = JSON.parse(localStorage.getItem("servers"))[serverId];
+		var server = JSON.parse(RTA.storage.getItem("servers"))[serverId];
 
 		if(server.rutorrentdirlabelask == true && server.client == "ruTorrent WebUI") {
-			chrome.tabs.sendRequest(tab.id, {"action": "showLabelDirChooser", "url": info.linkUrl, "settings": localStorage, "server": server});
+			chrome.tabs.sendRequest(tab.id, {"action": "showLabelDirChooser", "url": info.linkUrl, "settings": RTA.storage, "server": server});
 		}
 		else if (server.qbittorrentdirlabelask == true && server.client == "qBittorrent WebUI") {
-			chrome.tabs.sendRequest(tab.id, {"action": "showLabelDirChooser", "url": info.linkUrl, "settings": localStorage, "server": server});
+			chrome.tabs.sendRequest(tab.id, {"action": "showLabelDirChooser", "url": info.linkUrl, "settings": RTA.storage, "server": server});
 		} 
 		else if (server.qbittorrentv2dirlabelask == true && server.client == "qBittorrent v4.1+ WebUI") {
-			chrome.tabs.sendRequest(tab.id, {"action": "showLabelDirChooser", "url": info.linkUrl, "settings": localStorage, "server": server});
+			chrome.tabs.sendRequest(tab.id, {"action": "showLabelDirChooser", "url": info.linkUrl, "settings": RTA.storage, "server": server});
 		} 
 		else {
 			RTA.getTorrent(server, info.linkUrl, null, null, tab.url);

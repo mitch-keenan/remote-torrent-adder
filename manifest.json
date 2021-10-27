@@ -2,12 +2,13 @@
 	"name": "Remote Torrent Adder",
 	"short_name": "RTA",
 	"icons": {"16":"icons/BitTorrent16.png", "48":"icons/BitTorrent48.png", "128":"icons/BitTorrent128.png"},
-	"version": "1.3.8",
+	"version": "1.4.0",
 	"manifest_version": 2,
 	"description": "Add torrents using several programs' WebUIs",
-	"permissions": ["*://*/*","contextMenus","notifications","tabs","webRequest","webRequestBlocking"],
+	"permissions": ["*://*/*","contextMenus","notifications","tabs","webRequest","webRequestBlocking","storage"],
 	"background": {
 		"scripts": [
+			"miscapis/StorageProxy.js",
 			"miscapis/RTAinit.js",
 			"miscapis/browser.js",
 			"miscapis/safe-buffer.js",

@@ -1,4 +1,5 @@
 $(document).ready(function(){
+
 	var tabCounter = 1;
 	
 	registerGeneralSettingsEvents();
@@ -50,7 +51,7 @@ $(document).ready(function(){
 
 		function addTab(name, client, oldload) {
 			// some input validation
-			var servers = JSON.parse(localStorage.getItem("servers"))
+			var servers = JSON.parse(RTA.storage.getItem("servers"))
 			if(oldload !== true) {
 				for(var x in servers) {
 					if(servers[x].name == name || name === null || name === "") {
@@ -105,7 +106,7 @@ $(document).ready(function(){
 
 
 		// load server configs
-		var servers = JSON.parse(localStorage.getItem("servers"));
+		var servers = JSON.parse(RTA.storage.getItem("servers"));
 		for(var i in servers) {
 			var server = servers[i];
 
@@ -224,14 +225,14 @@ function flipVisibility(checkname, changename) {
 }
 
 function setSetting(e, val) {
-	localStorage[e.id] = (val == undefined) ? "" : val;
+	RTA.storage.set(e.id, (val == undefined) ? "" : val);
 }
 
 function getSetting(e) {
 	if(e.type == "text" || e.type == "password") {
-		document.getElementById(e.id).value = (localStorage[e.id] == undefined) ? "" : localStorage[e.id];
+		document.getElementById(e.id).value = RTA.storage.get(e.id) || "";
 	} else if(e.type == "checkbox") {
-		document.getElementById(e.id).checked = (localStorage[e.id] == "true") ? true : false;
+		document.getElementById(e.id).checked = RTA.storage.get(e.id) == "true";
 	}
 }
 
@@ -243,7 +244,7 @@ function saveMatches() {
 			var sep = (i++ == 0) ? "" : "~";
 			destStr += sep + opts[key].text;
 		}
-	localStorage["linkmatches"] = destStr;
+	RTA.storage.set("linkmatches", destStr);
 }
 
 function loadMatches() {
@@ -251,10 +252,11 @@ function loadMatches() {
 	newSelEl.setAttribute("id", "linkmatches");
 	newSelEl.setAttribute("multiple", "multiple");
 	newSelEl.setAttribute("size", "5");
-	if(localStorage["linkmatches"] != "")
-		for(key in localStorage["linkmatches"].split("~")) {
+	const linkMatches = RTA.storage.get("linkmatches")
+	if(linkMatches)
+		for(key in linkMatches.split("~")) {
 			var newEl = document.createElement("option");
-			newEl.text = localStorage["linkmatches"].split("~")[key];
+			newEl.text = linkMatches.split("~")[key];
 			newSelEl.appendChild(newEl);
 		}
 	var selEl = document.getElementById("linkmatches");
@@ -280,13 +282,13 @@ function deleteMatches() {
 	saveMatches();
 }
 
-Storage.prototype.setObject = function(key, val) {
-	this.setItem(key, JSON.stringify(val));
-}
-Storage.prototype.getObject = function(key) {
-	var value = this.getItem(key);
-    return value && JSON.parse(value);
-}
+// Storage.prototype.setObject = function(key, val) {
+// 	this.setItem(key, JSON.stringify(val));
+// }
+// Storage.prototype.getObject = function(key) {
+// 	var value = this.getItem(key);
+//     return value && JSON.parse(value);
+// }
 
 function registerGeneralSettingsEvents() {
 	document.querySelector("#linksfoundindicator").onchange = function() {
@@ -336,7 +338,7 @@ function registerGeneralSettingsEvents() {
 	};
 	
 	document.querySelector("#showfiltersbtn").onclick = function() {
-		alert(localStorage['linkmatches']);
+		alert(RTA.storage.get('linkmatches'));
 	};
 
 	document.querySelector("#registerDelay").onkeyup = function() {
@@ -344,7 +346,7 @@ function registerGeneralSettingsEvents() {
 	};
 
 	document.querySelector("#createBackupButton").onclick = function() {
-		const text = JSON.stringify(localStorage);
+		const text = JSON.stringify(RTA.storage);
 
 		var el = document.createElement("a");
 		el.setAttribute("href", "data:application/json;charset=utf-8," + encodeURIComponent(text));
@@ -366,7 +368,7 @@ function registerGeneralSettingsEvents() {
 					const settings = JSON.parse(reader.result);
 
 					for(const key in settings) {
-						localStorage.setItem(key, settings[key]);
+						RTA.storage.setItem(key, settings[key]);
 					}
 
 					resultField.innerHTML = "Result: &#x2714; Settings imported";
@@ -409,7 +411,7 @@ function saveServersSettings() {
 		servers[order[thisId]] = server;
 	});
 
-	localStorage.setItem("servers", JSON.stringify(servers))
+	RTA.storage.setItem("servers", JSON.stringify(servers))
 
 	chrome.extension.sendRequest({"action": "constructContextMenu"});
 	
